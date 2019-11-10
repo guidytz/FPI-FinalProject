@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-img = cv2.imread('c:\\temp\\statue_very_small.png')
+img = cv2.imread('statue_very_small.png')
 
 alt = np.array(img).shape[0]
 lar = np.array(img).shape[1]

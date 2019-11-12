@@ -28,9 +28,9 @@ def image_transpose(img):
     """Transposes an image in Numpy array
     Because we have 3 channels and we don't want to transpose then, this
     function preserves the third dimension of the image's Numpy array"""
-    [alt, lar, can] = np.array(img).shape
-    t_img = np.zeros((lar, alt, can))
-    for i in range(can):
+    [hgt, wid, chan] = np.array(img).shape
+    t_img = np.zeros((wid, hgt, chan))
+    for i in range(chan):
         t_img[:, :, i] = np.transpose(img[:, :, i])
     return t_img
 
@@ -41,18 +41,18 @@ def domain_transform(img, sigma_s, sigma_r, integrate):
     (the equation 11 in the paper) if 'integrate' is False, or the actual
     integrated components if True."""
 
-    [alt, lar, can] = np.array(img).shape
+    [hgt, wid, chan] = np.array(img).shape
 
     # Calculate parcial derivatives of Ik of the equation
     pd_ik_x = np.diff(img, 1, 1)
     pd_ik_y = np.diff(img, 1, 0)
 
     # Initialize the summation matrices of the equation
-    sum_pd_ik_x = np.zeros((alt, lar))
-    sum_pd_ik_y = np.zeros((alt, lar))
+    sum_pd_ik_x = np.zeros((hgt, wid))
+    sum_pd_ik_y = np.zeros((hgt, wid))
 
     # Perform the summation
-    for i in range(can):
+    for i in range(chan):
         sum_pd_ik_x[:, 1:] = sum_pd_ik_x[:, 1:] + abs(pd_ik_x[:, :, i])
         sum_pd_ik_y[1:, :] = sum_pd_ik_y[1:, :] + abs(pd_ik_y[:, :, i])
 

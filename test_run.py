@@ -7,7 +7,7 @@ import filters as ft
 
 
 def main():
-    img = cv2.imread('statue.png')
+    img = cv2.imread('lena.jpg')
 
     sigma_s = 200
     sigma_r = 0.3

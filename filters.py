@@ -1,24 +1,34 @@
+"""File containing the main filter functions"""
+
+# Imports
 import math
 import numpy as np
 
-def RF(img, der, sigma):
-    a = math.exp(-math.sqrt(2) / sigma)
-    V = a ** der
-    F = img
-    [lar, can] = np.array(img).shape[1:]
+def recursive_filtering(img, diff, sigma):
+    """Recursive Filtering"""
 
-    for i in range(1, lar):
-        for c in range(can):
-            F[:, i, c] = F[:, i, c] + V[:, i] * (F[:, i - 1, c] - F[:, i, c])
+    # Calculate the feedback coefficient with the equation explained in the
+    # papers' appendix
+    feedback_coef = math.exp(-math.sqrt(2) / sigma)
 
-    for i in range(lar-2, -1, -1):
-        for c in range(can):
-            F[:, i, c] = F[:, i, c] + V[:, i+1] * (F[:, i + 1, c] - F[:, i, c])
+    # Calculate the a^d terms of the equation 21
+    a_pow_d = feedback_coef ** diff
+    [wid, can] = np.array(img).shape[1:]
 
-    return F
+    # Apply the filter from left to right
+    for i in range(1, wid):
+        for j in range(can):
+            img[:, i, j] = img[:, i, j] + a_pow_d[:, i] * (img[:, i - 1, j] - img[:, i, j])
 
-def NC(img, sigma_s, sigma_r, n_it=3, joint_img=None):
+    # Apply the filter from right to left, achieving symmetric response
+    for i in range(wid-2, -1, -1):
+        for j in range(can):
+            img[:, i, j] = img[:, i, j] + a_pow_d[:, i+1] * (img[:, i + 1, j] - img[:, i, j])
+
+    return img
+
+def normalized_convolution(img, sigma_s, sigma_r, n_it=3, joint_img=None):
     pass
 
-def IC(img, sigma_s, sigma_r, n_it=3, joint_img=None):
+def interpolated_convolution(img, sigma_s, sigma_r, n_it=3, joint_img=None):
     pass

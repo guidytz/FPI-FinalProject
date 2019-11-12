@@ -1,8 +1,13 @@
-import math
+"""File containg auxiliar functions for applying the filters."""
+
+# Imports
 import numpy as np
 
-# For printing 3D matrices formatted as in MATLAB
-def printMat(arr):
+
+def print_3d(arr):
+    """Temporary function to print 3D arrays like in MATLAB. Remove before
+    submission."""
+
     for i in range(len(arr)):
         for j in range(len(arr[i])):
             print("%+.4f" % arr[i][j][0], end=' ')
@@ -18,44 +23,46 @@ def printMat(arr):
             print("%+.4f" % arr[i][j][2], end=' ')
         print('')
 
-# A function to transpose an image
-def transposeImage(img):
-    [h, w, num_channels] = np.array(img).shape
-    T = np.zeros((w, h, num_channels))
-    for c in range(num_channels):
-        T[:, :, c] = np.transpose(img[:, :, c])
-    return T
+
+def image_transpose(img):
+    """Transposes an image in Numpy array
+    Because we have 3 channels and we don't want to transpose then, this
+    function preserves the third dimension of the image's Numpy array"""
+    [alt, lar, can] = np.array(img).shape
+    t_img = np.zeros((lar, alt, can))
+    for i in range(can):
+        t_img[:, :, i] = np.transpose(img[:, :, i])
+    return t_img
 
 
-# Domain Transform function
-# Returns either the parcial derivatives of the Domain transform equation
-# (the equation 11 in the paper) if 'integrate' is False, or the actual
-# components if True.
-def DT(img,sigS,sigR,integrate):
-    ## Calculate the domain transform using equation 11 of the paper
+def domain_transform(img, sigma_s, sigma_r, integrate):
+    """Domain Transform function
+    Returns either the parcial derivatives of the Domain transform equation
+    (the equation 11 in the paper) if 'integrate' is False, or the actual
+    integrated components if True."""
+
     [alt, lar, can] = np.array(img).shape
 
-    # Calculate parcial derivatives of Ik of the equation 
-    pdIkx = np.diff(img, 1, 1)
-    pdIky = np.diff(img, 1, 0)
+    # Calculate parcial derivatives of Ik of the equation
+    pd_ik_x = np.diff(img, 1, 1)
+    pd_ik_y = np.diff(img, 1, 0)
 
-    # Initialize the summation matrices of the equation 
-    sum_pdIkx = np.zeros((alt, lar))
-    sum_pdIky = np.zeros((alt, lar))
+    # Initialize the summation matrices of the equation
+    sum_pd_ik_x = np.zeros((alt, lar))
+    sum_pd_ik_y = np.zeros((alt, lar))
 
     # Perform the summation
     for i in range(can):
-        sum_pdIkx[:, 1:] = sum_pdIkx[:, 1:] + abs(pdIkx[:, :, i])
-        sum_pdIky[1:, :] = sum_pdIky[1:, :] + abs(pdIky[:, :, i])
+        sum_pd_ik_x[:, 1:] = sum_pd_ik_x[:, 1:] + abs(pd_ik_x[:, :, i])
+        sum_pd_ik_y[1:, :] = sum_pd_ik_y[1:, :] + abs(pd_ik_y[:, :, i])
 
     # Finally, calculate the rest of the equation inside the integral
-    horDer = (1 + sigS/sigR * sum_pdIkx)
-    verDer = (1 + sigS/sigR * sum_pdIky)
+    hor_differences = (1 + sigma_s/sigma_r * sum_pd_ik_x)
+    ver_differences = (1 + sigma_s/sigma_r * sum_pd_ik_y)
 
     if integrate:
-        # Perform the integration
-        horInt = np.cumsum(horDer, 1)
-        verInt = np.cumsum(verDer, 0)
-        return (horInt, verInt)
-    else:
-        return (horDer, verDer)
+        # Perform the integration if required
+        return (np.cumsum(hor_differences, 1),
+                np.cumsum(ver_differences, 0))
+
+    return (hor_differences, ver_differences)

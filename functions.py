@@ -102,7 +102,7 @@ def limits_indexes(transform, hgt, wdt, radius):
             upper_indexes_row[col] = upper_indexes_row[col-1] + (
                 transform_row[int(upper_indexes_row[col-1]):] > upper_limits_row[col]).nonzero()[0][0]
 
-        lower_indexes[row, :] = lower_indexes_row + 1
-        upper_indexes[row, :] = upper_indexes_row + 1
+        lower_indexes[row, :] = lower_indexes_row
+        upper_indexes[row, :] = upper_indexes_row
 
     return (lower_indexes, upper_indexes)

@@ -7,12 +7,12 @@ import filters as ft
 
 
 def main():
-    img = cv2.imread('statue_very_small.png')
+    img = cv2.imread('statue.png')
 
     sigma_s = 200
-    sigma_r = 0.3
+    sigma_r = 2
     iterations = 3
-    ep_filter = 'NC'
+    ep_filter = 'RF'
 
     # Normalize the image
     img_norm = img/255
@@ -34,7 +34,7 @@ def main():
     img_out = img_norm
 
     # Aplly the choosen filter
-    for i in range(iterations-1):
+    for i in range(iterations):
         # Calculate the current sigma H using equation 14 of the paper
         cur_sigma_h = sigma_h * \
             math.sqrt(3) * (2**(iterations-(i+1))) / \

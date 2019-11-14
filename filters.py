@@ -37,8 +37,6 @@ def normalized_convolution(img, transform, box_radius):
     [lower_indexes, upper_indexes] = fn.limits_indexes(
         transform, hgt, wdt, box_radius)
 
-    print(lower_indexes)
-
     return img
 
 
@@ -46,6 +44,6 @@ def interpolated_convolution(img, transform, box_radius):
     [hgt, wdt, chan] = np.array(img).shape
     [lower_indexes, upper_indexes] = fn.limits_indexes(
         transform, hgt, wdt, box_radius)
-    print(lower_indexes)
+
 
     return img

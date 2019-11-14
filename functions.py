@@ -76,26 +76,33 @@ def limits_indexes(transform, hgt, wdt, radius):
     lower_limits = transform - radius
     upper_limits = transform + radius
 
+    #print(lower_limits)
+
     # Initialize the pixels matrices
     lower_indexes = np.zeros(np.array(transform).shape)
     upper_indexes = np.zeros(np.array(transform).shape)
 
-    # IMPLEMENTANDO \/
     for row in range(hgt):
         transform_row = np.concatenate([transform[row, :], np.array([np.inf])])
 
         lower_limits_row = lower_limits[row, :]
         upper_limits_row = upper_limits[row, :]
 
-        lower_indexes[row, 0] = (
+        lower_indexes_row = np.zeros([wdt])
+        upper_indexes_row = np.zeros([wdt])
+
+        lower_indexes_row[0] = (
             transform_row > lower_limits_row[0]).nonzero()[0][0]
-        upper_indexes[row, 0] = (
+        upper_indexes_row[0] = (
             transform_row > upper_limits_row[0]).nonzero()[0][0]
 
         for col in range(1, wdt):
-            lower_indexes[row, col] = lower_indexes[row, col-1] + (
-                transform_row[int(lower_indexes[row, col-1]):] > lower_limits_row[col]).nonzero()[0][0]
-            upper_indexes[row, col] = upper_indexes[row, col-1] + (
-                transform_row[int(upper_indexes[row, col-1]):] > upper_limits_row[col]).nonzero()[0][0]
+            lower_indexes_row[col] = lower_indexes_row[col-1] + (
+                transform_row[int(lower_indexes_row[col-1]):] > lower_limits_row[col]).nonzero()[0][0]
+            upper_indexes_row[col] = upper_indexes_row[col-1] + (
+                transform_row[int(upper_indexes_row[col-1]):] > upper_limits_row[col]).nonzero()[0][0]
+
+        lower_indexes[row, :] = lower_indexes_row + 1
+        upper_indexes[row, :] = upper_indexes_row + 1
 
     return (lower_indexes, upper_indexes)

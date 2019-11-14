@@ -77,18 +77,25 @@ def limits_indexes(transform, hgt, wdt, radius):
     upper_limits = transform + radius
 
     # Initialize the pixels matrices
-    lower_indexes = np.zeros(np.array(img).shape)
-    upper_indexes = np.zeros(np.array(img).shape)
+    lower_indexes = np.zeros(np.array(transform).shape)
+    upper_indexes = np.zeros(np.array(transform).shape)
 
-
-    ### IMPLEMENTANDO \/
+    # IMPLEMENTANDO \/
     for row in range(hgt):
-        transform_row = [transform[row,:], np.inf]
+        transform_row = np.concatenate([transform[row, :], np.array([np.inf])])
 
-        lower_limit = lower_limits[row,:]
-        upper_limit = upper_limits[row,:]
+        lower_limits_row = lower_limits[row, :]
+        upper_limits_row = upper_limits[row, :]
 
-        lower_limits(row,1) = np.find
-        
+        lower_indexes[row, 0] = (
+            transform_row > lower_limits_row[0]).nonzero()[0][0]
+        upper_indexes[row, 0] = (
+            transform_row > upper_limits_row[0]).nonzero()[0][0]
+
+        for col in range(1, wdt):
+            lower_indexes[row, col] = lower_indexes[row, col-1] + (
+                transform_row[int(lower_indexes[row, col-1]):] > lower_limits_row[col]).nonzero()[0][0]
+            upper_indexes[row, col] = upper_indexes[row, col-1] + (
+                transform_row[int(upper_indexes[row, col-1]):] > upper_limits_row[col]).nonzero()[0][0]
 
     return (lower_indexes, upper_indexes)

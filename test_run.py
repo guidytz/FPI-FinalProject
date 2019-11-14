@@ -12,7 +12,7 @@ def main():
     sigma_s = 200
     sigma_r = 0.3
     iterations = 3
-    ep_filter = 'RF'
+    ep_filter = 'NC'
 
     # Normalize the image
     img_norm = img/255

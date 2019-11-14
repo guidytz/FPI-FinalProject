@@ -3,6 +3,8 @@
 # Imports
 import math
 import numpy as np
+import functions as fn
+
 
 def recursive_filtering(img, diff, sigma):
     """Recursive Filtering"""
@@ -18,24 +20,32 @@ def recursive_filtering(img, diff, sigma):
     # Apply the filter from left to right
     for i in range(1, wid):
         for j in range(chan):
-            img[:, i, j] = img[:, i, j] + a_pow_d[:, i] * (img[:, i - 1, j] - img[:, i, j])
+            img[:, i, j] = img[:, i, j] + a_pow_d[:, i] * \
+                (img[:, i - 1, j] - img[:, i, j])
 
     # Apply the filter from right to left, achieving symmetric response
     for i in range(wid-2, -1, -1):
         for j in range(chan):
-            img[:, i, j] = img[:, i, j] + a_pow_d[:, i+1] * (img[:, i + 1, j] - img[:, i, j])
+            img[:, i, j] = img[:, i, j] + a_pow_d[:, i+1] * \
+                (img[:, i + 1, j] - img[:, i, j])
 
     return img
+
 
 def normalized_convolution(img, transform, box_radius):
     [hgt, wdt, chan] = np.array(img).shape
-    [lower_indexes, upper_indexes] = fn.limits_indexes(transform, hgt, wdt, box_radius)
+    [lower_indexes, upper_indexes] = fn.limits_indexes(
+        transform, hgt, wdt, box_radius)
+
+    print(lower_indexes)
 
     return img
 
+
 def interpolated_convolution(img, transform, box_radius):
     [hgt, wdt, chan] = np.array(img).shape
-    [lower_indexes, upper_indexes] = fn.limits_indexes(transform, hgt, wdt, box_radius)
-
+    [lower_indexes, upper_indexes] = fn.limits_indexes(
+        transform, hgt, wdt, box_radius)
+    print(lower_indexes)
 
     return img

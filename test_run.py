@@ -7,7 +7,7 @@ import filters as ft
 
 
 def main():
-    img = cv2.imread('lena.jpg')
+    img = cv2.imread('statue_very_small.png')
 
     sigma_s = 200
     sigma_r = 0.3
@@ -42,16 +42,18 @@ def main():
 
         # If the filter is not RF, we'll need the filter_radius
         if ep_filter != 'RF':
-            filter_radius = math.sqrt(3) * cur_sigma_h
+            box_radius = math.sqrt(3) * cur_sigma_h
 
         # Apply the filter
         if ep_filter == 'RF':
             img_out = ft.recursive_filtering(
                 img_out, hor_differences, cur_sigma_h)
         elif ep_filter == 'IC':
-            img_out = None
+            img_out = ft.interpolated_convolution(
+                img_out, hor_transform, box_radius)
         else:
-            img_out = None
+            img_out = ft.normalized_convolution(
+                img_out, hor_transform, box_radius)
 
         # Transpose the imagem so we can apply the filter vertically
         img_out = fn.image_transpose(img_out)
@@ -60,9 +62,11 @@ def main():
             img_out = ft.recursive_filtering(
                 img_out, np.transpose(ver_differences), cur_sigma_h)
         elif ep_filter == 'IC':
-            img_out = None
+            img_out = ft.interpolated_convolution(
+                img_out, np.transpose(ver_transform), box_radius)
         else:
-            img_out = None
+            img_out = ft.normalized_convolution(
+                img_out, np.transpose(ver_transform), box_radius)
 
         img_out = fn.image_transpose(img_out)
 

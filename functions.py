@@ -56,7 +56,7 @@ def domain_transform(img, sigma_s, sigma_r, integrate):
         sum_pd_ik_x[:, 1:] = sum_pd_ik_x[:, 1:] + abs(pd_ik_x[:, :, i])
         sum_pd_ik_y[1:, :] = sum_pd_ik_y[1:, :] + abs(pd_ik_y[:, :, i])
 
-    # Finally, calculate the rest of the equation inside the integral
+    # Apply the sigmas
     hor_differences = (1 + sigma_s/sigma_r * sum_pd_ik_x)
     ver_differences = (1 + sigma_s/sigma_r * sum_pd_ik_y)
 
@@ -66,3 +66,29 @@ def domain_transform(img, sigma_s, sigma_r, integrate):
                 np.cumsum(ver_differences, 0))
 
     return (hor_differences, ver_differences)
+
+
+def limits_indexes(transform, hgt, wdt, radius):
+    """ This function returns the indexes of the pixels associated with the
+    upper and lower limits of a box kernel"""
+
+    # Get the lower and upper limits of the kernel
+    lower_limits = transform - radius
+    upper_limits = transform + radius
+
+    # Initialize the pixels matrices
+    lower_indexes = np.zeros(np.array(img).shape)
+    upper_indexes = np.zeros(np.array(img).shape)
+
+
+    ### IMPLEMENTANDO \/
+    for row in range(hgt):
+        transform_row = [transform[row,:], np.inf]
+
+        lower_limit = lower_limits[row,:]
+        upper_limit = upper_limits[row,:]
+
+        lower_limits(row,1) = np.find
+        
+
+    return (lower_indexes, upper_indexes)

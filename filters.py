@@ -27,8 +27,15 @@ def recursive_filtering(img, diff, sigma):
 
     return img
 
-def normalized_convolution(img, sigma_s, sigma_r, n_it=3, joint_img=None):
-    pass
+def normalized_convolution(img, transform, box_radius):
+    [hgt, wdt, chan] = np.array(img).shape
+    [lower_indexes, upper_indexes] = fn.limits_indexes(transform, hgt, wdt, box_radius)
 
-def interpolated_convolution(img, sigma_s, sigma_r, n_it=3, joint_img=None):
-    pass
+    return img
+
+def interpolated_convolution(img, transform, box_radius):
+    [hgt, wdt, chan] = np.array(img).shape
+    [lower_indexes, upper_indexes] = fn.limits_indexes(transform, hgt, wdt, box_radius)
+
+
+    return img

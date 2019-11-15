@@ -68,19 +68,17 @@ def domain_transform(img, sigma_s, sigma_r, integrate):
     return (hor_differences, ver_differences)
 
 
-def limits_indexes(transform, hgt, wdt, radius):
-    """ This function returns the indexes of the pixels associated with the
+def limits_indices(transform, hgt, wdt, radius):
+    """ This function returns the indices of the pixels associated with the
     upper and lower limits of a box kernel"""
 
     # Get the lower and upper limits of the kernel
     lower_limits = transform - radius
     upper_limits = transform + radius
 
-    #print(lower_limits)
-
     # Initialize the pixels matrices
-    lower_indexes = np.zeros(np.array(transform).shape)
-    upper_indexes = np.zeros(np.array(transform).shape)
+    lower_indices = np.zeros(np.array(transform).shape)
+    upper_indices = np.zeros(np.array(transform).shape)
 
     for row in range(hgt):
         transform_row = np.concatenate([transform[row, :], np.array([np.inf])])
@@ -88,21 +86,21 @@ def limits_indexes(transform, hgt, wdt, radius):
         lower_limits_row = lower_limits[row, :]
         upper_limits_row = upper_limits[row, :]
 
-        lower_indexes_row = np.zeros([wdt])
-        upper_indexes_row = np.zeros([wdt])
+        lower_indices_row = np.zeros([wdt])
+        upper_indices_row = np.zeros([wdt])
 
-        lower_indexes_row[0] = (
+        lower_indices_row[0] = (
             transform_row > lower_limits_row[0]).nonzero()[0][0]
-        upper_indexes_row[0] = (
+        upper_indices_row[0] = (
             transform_row > upper_limits_row[0]).nonzero()[0][0]
 
         for col in range(1, wdt):
-            lower_indexes_row[col] = lower_indexes_row[col-1] + (
-                transform_row[int(lower_indexes_row[col-1]):] > lower_limits_row[col]).nonzero()[0][0]
-            upper_indexes_row[col] = upper_indexes_row[col-1] + (
-                transform_row[int(upper_indexes_row[col-1]):] > upper_limits_row[col]).nonzero()[0][0]
+            lower_indices_row[col] = lower_indices_row[col-1] + (
+                transform_row[int(lower_indices_row[col-1]):] > lower_limits_row[col]).nonzero()[0][0]
+            upper_indices_row[col] = upper_indices_row[col-1] + (
+                transform_row[int(upper_indices_row[col-1]):] > upper_limits_row[col]).nonzero()[0][0]
 
-        lower_indexes[row, :] = lower_indexes_row
-        upper_indexes[row, :] = upper_indexes_row
+        lower_indices[row, :] = lower_indices_row
+        upper_indices[row, :] = upper_indices_row
 
-    return (lower_indexes, upper_indexes)
+    return (lower_indices, upper_indices)

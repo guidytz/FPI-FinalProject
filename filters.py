@@ -36,7 +36,22 @@ def normalized_convolution(img, transform, box_radius):
     [hgt, wdt, chan] = np.array(img).shape
     [lower_indexes, upper_indexes] = fn.limits_indexes(
         transform, hgt, wdt, box_radius)
+    
 
+    # create a 'SAT' with the same size of the image
+    sum_a_table = np.zeros((hgt, wdt+1, chan)) 
+    
+    # compute sum of all columns along each row in each channel
+    sum_a_table[:,1:,:] = np.cumsum(np.array(img), 1) 
+
+    upper_indexes = upper_indexes.astype(int)
+    lower_indexes = lower_indexes.astype(int)
+
+    for c in range(chan):
+        for i in range(hgt):
+            for j in range(wdt):
+                img[i, j, c] = (sum_a_table[i, lower_indexes[i, j], c] \
+                     - sum_a_table[i, upper_indexes[i, j], c]) / (upper_indexes[i, j] - lower_indexes[i, j])
     return img
 
 

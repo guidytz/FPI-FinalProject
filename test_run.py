@@ -9,10 +9,10 @@ import filters as ft
 def main():
     img = cv2.imread('statue.png')
 
-    sigma_s = 200
-    sigma_r = 2
+    sigma_s = 60
+    sigma_r = 0.4
     iterations = 3
-    ep_filter = 'RF'
+    ep_filter = 'NC'
 
     # Normalize the image
     img_norm = img/255

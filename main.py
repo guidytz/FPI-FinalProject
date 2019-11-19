@@ -12,12 +12,16 @@ if __name__ == "__main__":
         sys.exit()
 
     # Get parameters
-    img_name = sys.argv[1]
-    filter_type = sys.argv[2]
-    sigma_s = float(sys.argv[3])
-    sigma_r = float(sys.argv[4])
-    iterations = int(sys.argv[5])
-
+    try:
+        img_name = sys.argv[1]
+        filter_type = sys.argv[2]
+        sigma_s = float(sys.argv[3])
+        sigma_r = float(sys.argv[4])
+        iterations = int(sys.argv[5])
+    except:
+        print("Error reading parameters.")
+        sys.exit()
+        
     # Read image
     img = cv2.imread(img_name)
 
@@ -41,7 +45,7 @@ if __name__ == "__main__":
         cv2.imshow('Original image', img)
         cv2.imshow('Filtered image', filtered_img)
     except:
-        print("Error reading image.", "\'"+img_name+"\'")
+        print("Error reading image or incorrect parameters for", "\'"+img_name+"\'")
         sys.exit()
 
     k = cv2.waitKey(0)

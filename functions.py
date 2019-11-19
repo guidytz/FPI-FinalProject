@@ -155,9 +155,11 @@ def ep_filter(img, filter_type, sigma_s, sigma_r, iterations):
         elif filter_type == 'IC':
             img_out = ft.interpolated_convolution(
                 img_out, hor_transform, cur_sigma_h)
-        else:
+        elif filter_type == 'NC':
             img_out = ft.normalized_convolution(
                 img_out, hor_transform, cur_sigma_h)
+        else:
+            raise ValueError("Unknown filter specified")
 
         # Transpose the imagem so we can apply the filter vertically
         img_out = image_transpose(img_out)

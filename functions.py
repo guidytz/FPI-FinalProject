@@ -1,7 +1,9 @@
 """File containg auxiliar functions for applying the filters."""
 
-# Imports
+import math
+import sys
 import numpy as np
+import filters as ft
 
 
 def print_3d(arr):
@@ -81,6 +83,8 @@ def limits_indices(transform, hgt, wdt, radius):
     upper_indices = np.zeros(np.array(transform).shape)
 
     for row in range(hgt):
+        # We create auxiliar matrices to reduce unnecessary processing and to keep
+        # the code clear
         transform_row = np.concatenate([transform[row, :], np.array([np.inf])])
 
         lower_limits_row = lower_limits[row, :]
@@ -95,12 +99,91 @@ def limits_indices(transform, hgt, wdt, radius):
             transform_row > upper_limits_row[0]).nonzero()[0][0]
 
         for col in range(1, wdt):
-            lower_indices_row[col] = lower_indices_row[col-1] + (
-                transform_row[int(lower_indices_row[col-1]):] > lower_limits_row[col]).nonzero()[0][0]
-            upper_indices_row[col] = upper_indices_row[col-1] + (
-                transform_row[int(upper_indices_row[col-1]):] > upper_limits_row[col]).nonzero()[0][0]
+            prev_lower_indices_row = lower_indices_row[col-1]
+            prev_upper_indices_row = upper_indices_row[col-1]
+            lower_indices_row[col] = prev_lower_indices_row + (
+                transform_row[int(prev_lower_indices_row):] > lower_limits_row[col]).nonzero()[0][0]
+            upper_indices_row[col] = prev_upper_indices_row + (
+                transform_row[int(prev_upper_indices_row):] > upper_limits_row[col]).nonzero()[0][0]
 
         lower_indices[row, :] = lower_indices_row
         upper_indices[row, :] = upper_indices_row
 
+        upper_indices = upper_indices.astype(int)
+        lower_indices = lower_indices.astype(int)
+
     return (lower_indices, upper_indices)
+
+
+def ep_filter(img, filter_type, sigma_s, sigma_r, iterations):
+    """Main function for applying the filters"""
+
+    # Normalize the image
+    img_norm = img/255
+
+    # Get the transformed signal for use in the filters
+    # In the RF filter, we do not need to integrate the domain transform because
+    # it uses the derivatives directly
+    if filter_type == 'RF':
+        [hor_differences, ver_differences] = domain_transform(
+            img_norm, sigma_s, sigma_r, False)
+    else:
+        [hor_transform, ver_transform] = domain_transform(
+            img_norm, sigma_s, sigma_r, True)
+
+    # Initialize the H sigma to be used next
+    sigma_h = sigma_s
+
+    # Initialize the output image
+    img_out = img_norm
+
+    progress = iterations * 2
+    step = 100 / progress
+    elapsed = step
+
+    # Aplly the choosen filter
+    for i in range(iterations):
+        # Calculate the current sigma H using equation 14 of the paper
+        cur_sigma_h = sigma_h * \
+            math.sqrt(3) * (2**(iterations-(i+1))) / \
+            math.sqrt(4**iterations - 1)
+
+        # Apply the filter
+        if filter_type == 'RF':
+            img_out = ft.recursive_filtering(
+                img_out, hor_differences, cur_sigma_h)
+        elif filter_type == 'IC':
+            img_out = ft.interpolated_convolution(
+                img_out, hor_transform, cur_sigma_h)
+        else:
+            img_out = ft.normalized_convolution(
+                img_out, hor_transform, cur_sigma_h)
+
+        # Transpose the imagem so we can apply the filter vertically
+        img_out = image_transpose(img_out)
+
+        progress -= 1
+        print("%.0f" % elapsed, end="%...")
+        elapsed += step
+        sys.stdout.flush()
+
+        if filter_type == 'RF':
+            img_out = ft.recursive_filtering(
+                img_out, np.transpose(ver_differences), cur_sigma_h)
+        elif filter_type == 'IC':
+            img_out = ft.interpolated_convolution(
+                img_out, np.transpose(ver_transform), cur_sigma_h)
+        else:
+            img_out = ft.normalized_convolution(
+                img_out, np.transpose(ver_transform), cur_sigma_h)
+
+        # Transpose it back
+        img_out = image_transpose(img_out)
+
+        progress -= 1
+        print("%.0f" % elapsed, end="%...")
+        elapsed += step
+        sys.stdout.flush()
+
+    print()
+    return img_out

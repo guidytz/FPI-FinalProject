@@ -36,7 +36,7 @@ if __name__ == "__main__":
         # Apply the filter
 
         if detail_enhancement:
-            # Convert image to the YCrCb space to take the operate witht the luminance channel (Y)
+            # Convert image to the YCrCb space to operate with the luminance channel (Y)
             img = cv.cvtColor(img, cv.COLOR_BGR2YCrCb)
             D = np.array(img[:, :, 0]).astype(float) 
            

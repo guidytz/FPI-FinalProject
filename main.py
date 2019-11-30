@@ -36,15 +36,27 @@ if __name__ == "__main__":
         # Apply the filter
 
         if detail_enhancement:
+            # Convert image to the YCrCb space to take the operate witht the luminance channel (Y)
             img = cv.cvtColor(img, cv.COLOR_BGR2YCrCb)
             D = np.array(img[:, :, 0]).astype(float) 
+           
+            # Filter the image using an egde-aware filter
             filtered_img = fn.ep_filter(
                 img, filter_type, sigma_s, sigma_r, iterations)
             img_n = img / 255
+           
+            # Take the difference in luminance between the filtered and original images 
+            # (image details are present in this difference)
             D[:, :] = img_n[:, :, 0] - filtered_img[:, :, 0]
+           
+            # Increase values of the details to amplify their effects
             D *= 2
+           
+            # Apply these enhancements in the original luminance value
             img_n[:, :, 0] += D[:, :]
             filtered_img = cv.convertScaleAbs(img_n * 255)
+           
+            # Convert back to RGB space
             filtered_img = cv.cvtColor(filtered_img, cv.COLOR_YCrCb2BGR)
             img = cv.cvtColor(img, cv.COLOR_YCrCb2BGR)
         else:
